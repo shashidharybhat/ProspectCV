@@ -40,6 +40,34 @@ Provide this as JSON with the following schema:
 }
 """
 
+MISSING_SKILLS_PROMPT = """
+<SYS>
+Consider the given CV:
+
+For the following Job Description:
+<JD_TEXT>
+Provide a list of skills that are present in the CV.
+Provide a list of missing skills from the job description that are not present in the CV.
+Provide this as a JSON array of strings.
+{
+    "missing": [string],
+    "present": [string]
+}
+"""
+
+RESOURCES_PROMPT = """
+<SYS>
+Consider the given CV:
+
+For the following Job Description:
+<JD_TEXT>
+Provide a list of resources that the candidate can use to improve their resume.
+Keep the resources relevant to the job description and the candidate's experience.
+Do not give generic resources.
+Keep resources specific and accurate.
+Provide this as Markdown text and not JSON.
+"""
+
 SYSTEM_TAILORING = """
 You are a smart assistant to career advisors at the Harvard Extension School. Your take is to rewrite
 resumes to be more brief and convincing according to the Resumes and Cover Letters guide.
@@ -130,28 +158,6 @@ interface Education {
 Write the education section according to the Education schema. On the response, include only the JSON.
 """
 
-AWARDS_PROMPT = """
-<SYS>
-You are going to write a JSON resume section for an applicant applying for job posts.
-
-Consider the following CV:
-<CV_TEXT>
-
-Now consider the following TypeScript Interface for the JSON schema:
-
-interface AwardItem {
-    title: string;
-    date: string;
-    awarder: string;
-    summary: string;
-}
-
-interface Awards {
-    awards: AwardItem[];
-}
-
-Write the awards section according to the Awards schema. Include only the awards section.If there are no awards, return empty json. On the response, include only the JSON.
-"""
 
 PROJECTS_PROMPT = """
 <SYS>
@@ -246,4 +252,17 @@ def generate_matching_json(uploaded_file, job_description_text):
 def generate_final_thoughts(uploaded_file, job_description_text):
     pdf_content=input_pdf_setup(uploaded_file)
     response=get_gemini_response(FINAL_THOUGHTS_PROMPT.replace("<SYS>",SYSTEM_PROMPT).replace("<JD_TEXT>",job_description_text),pdf_content,None)
+    return response
+
+def generate_missing_skills(uploaded_file, job_description_text):
+    pdf_content=input_pdf_setup(uploaded_file)
+    response=get_gemini_response(MISSING_SKILLS_PROMPT.replace("<SYS>",SYSTEM_PROMPT).replace("<JD_TEXT>",job_description_text),pdf_content,None)
+    json_out = str(response).replace('```json', '').replace('```', '').replace('JSON', '')
+    json_out = json_out[json_out.find("{"):]
+    json_response = json.loads(json_out)
+    return json_response
+
+def generate_resources(uploaded_file, job_description_text):
+    pdf_content=input_pdf_setup(uploaded_file)
+    response=get_gemini_response(RESOURCES_PROMPT.replace("<SYS>",SYSTEM_PROMPT).replace("<JD_TEXT>",job_description_text),pdf_content,None)
     return response

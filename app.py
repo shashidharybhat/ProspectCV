@@ -3,7 +3,7 @@ import os
 from PIL import Image 
 import google.generativeai as genai
 from layouts import get_gemini_response,input_pdf_setup
-from prompts import generate_profile_json, generate_matching_json, generate_final_thoughts
+from prompts import generate_profile_json, generate_matching_json, generate_final_thoughts, generate_missing_skills, generate_resources
 import base64
 import json
 import pandas as pd
@@ -13,9 +13,24 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 def main():
     st.set_page_config(layout="wide",page_title="Prospect CV",page_icon=":rocket:",initial_sidebar_state="expanded")
+    st.markdown(
+        """
+            <style>
+                .appview-container .main .block-container {{
+                    padding-top: {padding_top}rem;
+                    padding-bottom: {padding_bottom}rem;
+                    }}
+
+            </style>""".format(
+            padding_top=1, padding_bottom=1
+        ),
+        unsafe_allow_html=True,
+    )
     profile_json = {}
     match_parameters = {}
     final_thoughts = ""
+    skills = {}
+    resources = ""
     submitted = False
     st.title("Prospect CV")
     tab1, tab2, tab3, tab4 = st.tabs(["Profile Information", "Resume Analysis", "Improvements", "Resources"])
@@ -27,7 +42,7 @@ def main():
             with st.spinner("Processing..."):
                 if uploaded_file is not None and job_description_text != "":
                     file_path = save_uploaded_file(uploaded_file)
-                    profile_json,match_parameters,final_thoughts = process_file(file_path, job_description_text)
+                    profile_json,match_parameters,final_thoughts, skills, resources = process_file(file_path, job_description_text)
                     submitted = True
                     st.success("Resume and JD Processed Successfully")
                 elif uploaded_file is None:
@@ -77,6 +92,26 @@ def main():
                 st.subheader("Final Thoughts:")
                 st.write(final_thoughts)
 
+    with tab3:
+        #Highlight present and missing skills
+        st.subheader("Improvements")
+        if skills != {}:           
+            present = skills.get("present", [])
+            missing = skills.get("missing", [])
+            left_column, right_column = st.columns(2)
+            with right_column:
+                st.write("Missing Skills:")
+                st.table(pd.DataFrame(missing, columns=["Missing Skills"]))
+            with left_column:
+                st.write("Present Skills:")
+                st.table(pd.DataFrame(present, columns=["Present Skills"]))
+
+    
+    with tab4:
+        st.subheader("Resources")
+        if resources != "":
+            st.write(resources)
+
 
 def display_profile_data(json_data):
     basics = json_data.get("basics", {})
@@ -113,13 +148,16 @@ def process_file(file_path, jd_text):
     profile_json = {}
     match_parameters = {}
     final_thoughts = ""
+    skills = []
+    resources = ""
     profile_json = generate_profile_json(file_path)
     if jd_text is not None:
         match_parameters = generate_matching_json(file_path, jd_text)
         final_thoughts = generate_final_thoughts(file_path, jd_text)
-
+        skills = generate_missing_skills(file_path, jd_text)
+        resources = generate_resources(file_path, jd_text)
     os.remove(file_path)
-    return profile_json, match_parameters, final_thoughts
+    return profile_json, match_parameters, final_thoughts, skills, resources
 
 if __name__ == "__main__":
     main()
