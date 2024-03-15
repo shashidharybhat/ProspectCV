@@ -61,7 +61,9 @@ Consider the given CV:
 
 For the following Job Description:
 <JD_TEXT>
+
 Provide a list of resources that the candidate can use to improve their resume.
+Provide these resources as categories ( Courses, Books, Websites, etc)
 Keep the resources relevant to the job description and the candidate's experience.
 Do not give generic resources.
 Keep resources specific and accurate.
