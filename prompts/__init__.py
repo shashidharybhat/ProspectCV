@@ -1,6 +1,5 @@
 
 import json
-from stqdm import stqdm
 import google.generativeai as gglAI
 from layouts import get_gemini_response,input_pdf_setup
 
@@ -104,13 +103,11 @@ Provide this as JSON with the following schema:
         "phone": string,
         "website": string,
         "experienceInYears": string,
-        "location": {
-            "address": string,
-            "postalCode": string,
-            "city": string,
-            "countryCode": string,
-            "region": string
-        }
+        "locationCity": string,
+        "UniversityName": string,
+        "GraduationYear: string,
+        "DegreeDomain": string,
+    }
     
 }
 Correct any incorrect formatting and remove undue whitespaces.
