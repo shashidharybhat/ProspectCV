@@ -103,10 +103,7 @@ Provide this as JSON with the following schema:
         "phone": string,
         "website": string,
         "experienceInYears": string,
-        "locationCity": string,
-        "UniversityName": string,
-        "GraduationYear: string,
-        "DegreeDomain": string,
+        "city": string
     }
     
 }
