@@ -32,7 +32,9 @@ def main():
     skills = {}
     resources = ""
     submitted = False
-    st.title("Prospect CV")
+    # st.title("**ProspectCV**")
+    st.markdown(""" ## **ProspectCV:** _LLM based advanced CV-JD evaluation platform_ """)
+    st.text("by Ghanashyam Vagale, Shashidhar Y Bhat & Prajwal GK [Group 47]")
     tab1, tab2, tab3, tab4 = st.tabs(["Profile Information", "Resume Analysis", "Improvements", "Resources"])
     with st.sidebar:
         uploaded_file = st.file_uploader(
@@ -116,8 +118,8 @@ def main():
 def display_profile_data(json_data):
     basics = json_data.get("basics", {})
     title = True
-    basics_fields = ["Name", "Email", "Phone", "Website", "Experience"]
-    basics_keys = ["name", "email", "phone", "website", "experienceInYears"]
+    basics_fields = ["Name", "Email", "Phone", "Website", "Location", "Work Experience (In Years)"]
+    basics_keys = ["name", "email", "phone", "website",  "city", "experienceInYears"]
     
     for field, key in zip(basics_fields, basics_keys):
         value = basics.get(key)
