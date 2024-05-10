@@ -51,7 +51,7 @@ def main():
                     st.error("Please upload the resume")
                 elif job_description_text == "":
                     file_path = save_uploaded_file(uploaded_file)
-                    profile_json,match_parameters,final_thoughts = process_file(file_path, None)
+                    profile_json,match_parameters,final_thoughts, skills, resources = process_file(file_path, None)
                     submitted = True
                     st.success("Resume Processed Successfully")
 
@@ -97,22 +97,32 @@ def main():
     with tab3:
         #Highlight present and missing skills
         st.subheader("Improvements")
-        if skills != {}:           
-            present = skills.get("present", [])
-            missing = skills.get("missing", [])
-            left_column, right_column = st.columns(2)
-            with right_column:
-                st.write("Missing Skills:")
-                st.table(pd.DataFrame(missing, columns=["Missing Skills"]))
-            with left_column:
-                st.write("Present Skills:")
-                st.table(pd.DataFrame(present, columns=["Present Skills"]))
+        if job_description_text == "":
+            st.write("Please input a Job Description")
+        elif submitted == False:
+            st.write("Please click on the Submit button to process the Resume")
+        else:
+            if skills != {}:           
+                present = skills.get("present", [])
+                missing = skills.get("missing", [])
+                left_column, right_column = st.columns(2)
+                with right_column:
+                    st.write("Missing Skills:")
+                    st.table(pd.DataFrame(missing, columns=["Missing Skills"]))
+                with left_column:
+                    st.write("Present Skills:")
+                    st.table(pd.DataFrame(present, columns=["Present Skills"]))
 
     
     with tab4:
         st.subheader("Resources")
-        if resources != "":
-            st.write(resources)
+        if job_description_text == "":
+            st.write("Please input a Job Description")
+        elif submitted == False:
+            st.write("Please click on the Submit button to process the Resume")
+        else:
+            if resources != "":
+                st.write(resources)
 
 
 def display_profile_data(json_data):
@@ -150,7 +160,7 @@ def process_file(file_path, jd_text):
     profile_json = {}
     match_parameters = {}
     final_thoughts = ""
-    skills = []
+    skills = {}
     resources = ""
     profile_json = generate_profile_json(file_path)
     if jd_text is not None:
